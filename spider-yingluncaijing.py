@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO,
 
 BASE_URL = 'https://cn.investing.com/news/cryptocurrency-news'
 PRO_BASE_URL = 'https://cn.investing.com/'
-TOTAL_PAGE = 10
+TOTAL_PAGE = 3
 
 RESULTS_DIR = 'results'
 exists(RESULTS_DIR) or makedirs(RESULTS_DIR)
@@ -121,31 +121,41 @@ def parse_detail(detail_html):
     }
 
 
-def main():
-    # 获取主页的内容
-    for page in range(1, 1 + 1):
-        index_html = scrape_index(page)
-        # 解析主页的内容 获取到主页列表的所有详情页
-        detail_urls = parse_index(index_html)
+# def main():
+#     # 获取主页的内容
+#     for page in range(0, 1+3):
+#         index_html = scrape_index(page)
+#         # 解析主页的内容 获取到主页列表的所有详情页
+#         detail_urls = parse_index(index_html)
+#     for detail_url in detail_urls:
+#         # 解析单个详情页内容
+#         detail_html = scrape_detail(detail_url)
+#         data = parse_detail(detail_html)
+#         # logging.info('get detail data %s', data)
+#         # logging.info('saving data to json file')
+#         # 保存内容
+#         print(data)
+#         save_data(data)
+#         logging.info('data saved successfully')
+
+
+def main(page):
+    index_html = scrape_index(page)
+    detail_urls = parse_index(index_html)
     for detail_url in detail_urls:
-        # 解析单个详情页内容
         detail_html = scrape_detail(detail_url)
         data = parse_detail(detail_html)
         # logging.info('get detail data %s', data)
-        # logging.info('saving data to json file')
-        # 保存内容
+        # logging.info('saving data to mongodb')
         print(data)
         save_data(data)
         logging.info('data saved successfully')
 
 
-# if __name__ == '__main__':
-#     pool = multiprocessing.Pool()
-#     pages = range(1, TOTAL_PAGE + 1)
-#     # pages 为 1-11   pool.map 表示 main是调用的方法，pages需要遍历的页码 既1-11
-#     pool.map(main, pages)
-#     pool.close()
-#     pool.join()
-
 if __name__ == '__main__':
-    main()
+    pool = multiprocessing.Pool()
+    pages = range(1, TOTAL_PAGE + 1)
+    # pages 为 1-11   pool.map 表示 main是调用的方法，pages需要遍历的页码 既1-11
+    pool.map(main, pages)
+    pool.close()
+    pool.join()
